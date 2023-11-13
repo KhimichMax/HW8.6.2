@@ -4,42 +4,40 @@ using UnityEngine;
 
 public class RunnerScript : MonoBehaviour
 {
-    [SerializeField] private Transform _firstCube;
-    [SerializeField] private Transform _secondCube;
-    [SerializeField] private Transform _thirdCube;
-    private Vector3 _targetRuner;
-    private float _passDistance;
-    private List<Transform> _arrRunner;
-
-    private void AddRunner()
-    {
-        _arrRunner.Add(_firstCube);
-        _arrRunner.Add(_secondCube);
-        _arrRunner.Add(_thirdCube);
-    }
-
+    [SerializeField] private Transform[] _arrRunner;
+    private Transform _currentRunner;
+    private Transform _nextRunner;
+    private int _runnerIndex = 0;
+    private float _distance;
+    private float _passDistance = 1.2f;
+    private bool flag;
+    
     private void CycleRunnerRun()
     {
-        _firstCube.position = Vector3.MoveTowards(_firstCube.position, _targetRuner, Time.deltaTime);
-
-        for (int i = 0; i < _arrRunner.Count; i++)
+        _distance = Vector3.Distance(_currentRunner.position, _nextRunner.position);
+        if (_distance <= _passDistance)
         {
-            if (_targetRuner == _arrRunner[i].position)
+            _runnerIndex++;
+            if (_runnerIndex >= _arrRunner.Length)
             {
-                _targetRuner = _arrRunner[i + 1].position;
+                _runnerIndex = 0;
             }
+            _currentRunner = _nextRunner;
+            _nextRunner = _arrRunner[_runnerIndex];
         }
     }
     
     void Start()
     {
-        AddRunner();
-        _targetRuner = _firstCube.position;
+        _currentRunner = _arrRunner[0];
+        _runnerIndex += 1;
+        _nextRunner = _arrRunner[_runnerIndex];
     }
 
     
     void Update()
     {
-        
+        _currentRunner.position = Vector3.MoveTowards(_currentRunner.position, _nextRunner.position, Time.deltaTime);
+        CycleRunnerRun();
     }
 }
